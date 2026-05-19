@@ -4,6 +4,7 @@
 
 ## 🗂 Database Design (ERD)
 
+```mermaid
 erDiagram
     USERS ||--o{ POSTS : writes
     USERS ||--o{ COMMENTS : writes
