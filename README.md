@@ -4,7 +4,6 @@
 
 ## 🗂 Database Design (ERD)
 
-\`\`\`mermaid
 erDiagram
     USERS ||--o{ POSTS : writes
     USERS ||--o{ COMMENTS : writes
@@ -60,7 +59,8 @@ erDiagram
         int author_id FK
         boolean is_deleted
     }
-\`\`\`
+
+---
 
 ## 주요 설계 원칙
 1. **정규화 및 관계 정의**: USERS, BOARDS, POSTS, COMMENTS 엔티티 간의 관계를 명확히 정의하여 데이터 중복을 최소화했습니다.
