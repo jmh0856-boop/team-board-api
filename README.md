@@ -60,7 +60,7 @@ erDiagram
         int author_id FK
         boolean is_deleted
     }
-'''
+```
 
 ---
 
