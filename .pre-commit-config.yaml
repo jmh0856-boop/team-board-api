@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace # 줄 끝 공백 제거
+      - id: end-of-file-fixer    # 파일 마지막 줄 개행 추가
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black               # 코드 포맷팅 자동화
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort               # import 자동 정렬
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8              # 코드 품질 체크 (문법, 가이드라인)
