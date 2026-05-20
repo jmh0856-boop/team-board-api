@@ -27,15 +27,15 @@ def get_current_user(
 
     payload = decode_access_token(token)
     if payload is None:
-        raise credentials_exception
+        raise credentials_exception  # 401
 
     # payload의 sub에서 user_id 추출
     user_id: str = payload.get("sub")
     if user_id is None:
-        raise credentials_exception
+        raise credentials_exception  # 401
 
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
-        raise credentials_exception
+        raise credentials_exception  # 401
 
     return user
