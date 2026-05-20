@@ -20,16 +20,28 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(data: dict) -> str:
-    """JWT Access Token 생성
-
-    - data: 토큰에 담을 정보 (보통 {"sub": str(user.id)})
-    - 만료 시간은 settings에서 가져옴
-    """
+    """JWT Access Token 생성 (단기 토큰)"""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
     )
-    to_encode.update({"exp": expire})  # 만료 시간을 payload에 추가
+    to_encode.update({"exp": expire})
+    return jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM,
+    )
+
+
+def create_refresh_token(data: dict) -> str:
+    """JWT Refresh Token 생성 (장기 토큰)
+
+    - Access Token 만료 시 재발급에 사용
+    - 만료 시간은 7일로 고정
+    """
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(days=7)
+    to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(
         to_encode,
         settings.SECRET_KEY,
