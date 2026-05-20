@@ -1,7 +1,8 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import InvalidTokenException
 from app.core.security import decode_access_token
 from app.database import get_db
 from app.models.user import User
@@ -19,23 +20,17 @@ def get_current_user(
     - 토큰이 없거나 유효하지 않으면 401 반환
     - 토큰은 유효하지만 유저가 DB에 없으면 401 반환
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="유효하지 않은 토큰입니다.",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
     payload = decode_access_token(token)
     if payload is None:
-        raise credentials_exception  # 401
+        raise InvalidTokenException()
 
     # payload의 sub에서 user_id 추출
     user_id: str = payload.get("sub")
     if user_id is None:
-        raise credentials_exception  # 401
+        raise InvalidTokenException()
 
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
-        raise credentials_exception  # 401
+        raise InvalidTokenException()
 
     return user
