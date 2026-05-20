@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import InvalidTokenException, UnauthorizedException
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -31,11 +32,7 @@ def login(
         password=form_data.password,
     )
     if not tokens:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="이메일 또는 비밀번호가 올바르지 않습니다.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedException(detail="이메일 또는 비밀번호가 올바르지 않습니다.")  # 수정
     return Token(**tokens)
 
 
@@ -49,16 +46,12 @@ def refresh_token(request: RefreshTokenRequest):
     """
     payload = decode_access_token(request.refresh_token)
     if payload is None or payload.get("type") != "refresh":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="유효하지 않은 Refresh Token입니다.",
-        )
+        raise InvalidTokenException()
+
     user_id = payload.get("sub")
     if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="유효하지 않은 Refresh Token입니다.",
-        )
+        raise InvalidTokenException()
+
     data = {"sub": user_id}
     return Token(
         access_token=create_access_token(data=data),

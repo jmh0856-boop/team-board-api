@@ -39,3 +39,25 @@ class DuplicateEmailException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="이미 사용 중인 이메일입니다.",
         )
+
+
+class UnauthorizedException(HTTPException):
+    """인증 실패 - 토큰 없거나 유효하지 않은 경우"""
+
+    def __init__(self, detail: str = "인증에 실패했습니다."):
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=detail,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+class InvalidTokenException(HTTPException):  # 추가
+    """유효하지 않은 토큰"""
+
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="유효하지 않은 토큰입니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
