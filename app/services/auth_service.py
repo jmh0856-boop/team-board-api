@@ -1,6 +1,10 @@
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, verify_password
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    verify_password,
+)
 from app.models.user import User
 
 
@@ -28,5 +32,10 @@ def login_user(db: Session, email: str, password: str) -> str | None:
     user = authenticate_user(db, email, password)
     if not user:
         return None
-    access_token = create_access_token(data={"sub": str(user.id)})
-    return access_token
+    data = {"sub": str(user.id)}
+    access_token = create_access_token(data=data)
+    refresh_token = create_refresh_token(data=data)
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }
