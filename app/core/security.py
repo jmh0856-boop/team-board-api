@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 from app.core.config import settings
@@ -59,6 +60,6 @@ def decode_access_token(token: str) -> dict | None:
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         return payload
-    except JWTError:
+    except InvalidTokenError:
         # 위조되었거나 만료된 토큰 → None 반환 (호출부에서 401 처리)
         return None
