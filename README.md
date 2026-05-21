@@ -2,6 +2,66 @@
 
 본 프로젝트는 팀 협업을 위한 게시판 API 서비스입니다.
 
+---
+
+## 📝 User Requirements (사용자 요구사항 정의서)
+
+### 사용자 유형
+| 유형 | 설명 |
+|------|------|
+| 비회원 | 로그인하지 않은 사용자 |
+| 회원 | 로그인한 사용자 |
+| 관리자 | 관리 권한을 가진 사용자 |
+
+---
+
+### 인증
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-01 | 비회원 | 이메일과 비밀번호로 회원가입을 할 수 있다 | 상 |
+| REQ-02 | 비회원 | 이메일은 중복 가입이 불가능하다 | 상 |
+| REQ-03 | 비회원 | 이메일과 비밀번호로 로그인을 할 수 있다 | 상 |
+| REQ-04 | 회원 | Refresh Token으로 Access Token을 재발급 받을 수 있다 | 중 |
+
+---
+
+### 게시글
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-05 | 비회원 | 게시글 목록을 조회할 수 있다 | 상 |
+| REQ-06 | 비회원 | 게시글 상세 내용을 조회할 수 있다 | 상 |
+| REQ-07 | 비회원 | 게시글 조회 시 조회수가 증가한다 | 중 |
+| REQ-08 | 회원 | 게시글을 작성할 수 있다 | 상 |
+| REQ-09 | 회원 | 본인이 작성한 게시글을 수정할 수 있다 | 상 |
+| REQ-10 | 회원/관리자 | 본인이 작성한 게시글 또는 관리자는 모든 게시글을 삭제할 수 있다 | 상 |
+
+---
+
+### 좋아요/싫어요
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-11 | 회원 | 게시글에 좋아요를 누를 수 있다 | 중 |
+| REQ-12 | 회원 | 게시글에 싫어요를 누를 수 있다 | 중 |
+| REQ-13 | 회원 | 좋아요/싫어요를 다시 누르면 취소된다 | 중 |
+| REQ-14 | 회원 | 좋아요 상태에서 싫어요를 누를 수 없다 (반대도 동일) | 중 |
+| REQ-15 | 회원 | 댓글에 좋아요를 누를 수 있다 | 중 |
+| REQ-16 | 회원 | 댓글에 싫어요를 누를 수 있다 | 중 |
+
+---
+
+### 댓글
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-17 | 비회원 | 게시글의 댓글 목록을 조회할 수 있다 | 상 |
+| REQ-18 | 회원 | 게시글에 댓글을 작성할 수 있다 | 상 |
+| REQ-19 | 회원 | 본인이 작성한 댓글을 수정할 수 있다 | 중 |
+| REQ-20 | 회원/관리자 | 본인이 작성한 댓글 또는 관리자는 모든 댓글을 삭제할 수 있다 | 상 |
+| REQ-21 | 회원 | 댓글에 대댓글을 작성할 수 있다 | 중 |
+| REQ-22 | 비회원 | 댓글의 대댓글 목록을 조회할 수 있다 | 중 |
+| REQ-23 | - | 삭제된 댓글은 삭제 주체에 따라 다른 메시지로 표시된다 | 중 |
+
+---
+
 ## 🗂 Database Design (ERD)
 
 ```mermaid
@@ -34,8 +94,8 @@ erDiagram
         int id PK
         string title
         string content
-        int views
-        int owner_id FK
+        int view_count
+        int user_id FK
         int board_id FK
         datetime created_at
         datetime updated_at
@@ -62,10 +122,11 @@ erDiagram
         string content
         int parent_id FK
         int post_id FK
-        int author_id FK
+        int user_id FK
         boolean is_deleted
         string deleted_by
         datetime created_at
+        datetime updated_at
     }
 ```
 
@@ -79,7 +140,6 @@ erDiagram
    - Self-referencing: COMMENTS 테이블 내 parent_id를 통해 계층형 대댓글 구조를 구현했습니다.
    - Soft Delete: 댓글 삭제 시 물리적 삭제 대신 `deleted_by` 필드로 삭제 주체(작성자/관리자)를 기록하여 대화 맥락을 유지하도록 설계했습니다.
    - 중복 방지: LIKES 및 COMMENT_LIKES 테이블에 복합 유니크 제약을 설정하여 사용자당 좋아요/싫어요 1회 제한 정책을 강제했습니다.
-
 
 ---
 
@@ -112,6 +172,7 @@ erDiagram
 | title | VARCHAR(200) | NOT NULL | 게시글 제목 |
 | content | TEXT | NOT NULL | 게시글 내용 |
 | user_id | INTEGER | FK(USERS.id), NOT NULL | 작성자 ID |
+| board_id | INTEGER | FK(BOARDS.id), NULL | 게시판 ID (구현 예정) |
 | view_count | INTEGER | DEFAULT 0 | 조회수 |
 | created_at | DATETIME | DEFAULT NOW | 작성일시 |
 | updated_at | DATETIME | NULL | 수정일시 |
@@ -129,6 +190,7 @@ erDiagram
 | is_deleted | BOOLEAN | DEFAULT FALSE | 삭제 여부 |
 | deleted_by | VARCHAR | NULL | 삭제 주체 (user/admin) |
 | created_at | DATETIME | DEFAULT NOW | 작성일시 |
+| updated_at | DATETIME | NULL | 수정일시 |
 
 ---
 
