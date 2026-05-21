@@ -5,8 +5,10 @@ sqlalchemy
 psycopg2-binary
 python-dotenv
 passlib[bcrypt]
-python-jose[cryptography]
+PyJWT
 pre-commit
 black
 isort
 flake8
+pydantic-settings
+python-multipart
