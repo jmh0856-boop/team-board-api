@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 
 from app.database import Base, engine
-from app.models import comment  # noqa
+from app.models import comment  # noqa: F401
+from app.models import comment_like  # noqa: F401
 from app.models import like  # noqa: F401
 from app.models import post  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.routes.auth import router as auth_router
+from app.routes.comments import router as comment_router
 from app.routes.posts import router as post_router
 from app.routes.users import router as user_router
 
@@ -18,6 +20,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(post_router)
+app.include_router(comment_router)
 
 
 @app.get("/")
