@@ -2,12 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# DB 연결 정보 (SQLite 사용 예시)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./team_board.db"
+from app.core.config import settings
 
-# 엔진 생성
+# .env의 DATABASE_URL 사용
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    settings.DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
 # 세션 생성
