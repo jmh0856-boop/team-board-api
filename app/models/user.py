@@ -17,5 +17,6 @@ class User(Base):
 
     # 관계 설정
     posts = relationship("Post", back_populates="author")
-    # comments = relationship("Comment", back_populates="author")
+    comments = relationship("Comment", back_populates="author")
     likes = relationship("Like", back_populates="user")
+    comment_likes = relationship("CommentLike", back_populates="user")
