@@ -74,8 +74,8 @@ def delete(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),  # 로그인 필요
 ):
-    """게시글 삭제 - 작성자만 가능"""
-    delete_post(db, post_id, current_user.id)
+    """게시글 삭제 - 작성자 or 관리자만 가능"""
+    delete_post(db, post_id, current_user.id, is_admin=current_user.is_admin)
     return {"success": True, "message": "게시글이 삭제되었습니다."}
 
 
