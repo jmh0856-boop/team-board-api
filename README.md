@@ -20,6 +20,8 @@ erDiagram
         int id PK
         string email
         string password
+        string phone_number
+        boolean is_active
         datetime created_at
     }
 
@@ -36,6 +38,7 @@ erDiagram
         int owner_id FK
         int board_id FK
         datetime created_at
+        datetime updated_at
     }
 
     LIKES {
@@ -43,6 +46,7 @@ erDiagram
         int user_id FK
         int post_id FK
         boolean is_like
+        datetime created_at
     }
 
     COMMENT_LIKES {
@@ -50,6 +54,7 @@ erDiagram
         int user_id FK
         int comment_id FK
         boolean is_like
+        datetime created_at
     }
 
     COMMENTS {
@@ -59,6 +64,8 @@ erDiagram
         int post_id FK
         int author_id FK
         boolean is_deleted
+        string deleted_by
+        datetime created_at
     }
 ```
 
@@ -70,5 +77,5 @@ erDiagram
 3. **데이터 무결성 (CASCADE)**: POSTS 삭제 시 관련 COMMENTS가 고아 데이터로 남지 않도록 CASCADE 옵션을 적용하였습니다.
 4. **대댓글 및 좋아요 기능**:
    - Self-referencing: COMMENTS 테이블 내 parent_id를 통해 계층형 대댓글 구조를 구현했습니다.
-   - Soft Delete: 댓글 삭제 시 물리적 삭제 대신 본문만 초기화하여 대화 맥락을 유지하도록 설계했습니다.
+   - Soft Delete: 댓글 삭제 시 물리적 삭제 대신 `deleted_by` 필드로 삭제 주체(작성자/관리자)를 기록하여 대화 맥락을 유지하도록 설계했습니다.
    - 중복 방지: LIKES 및 COMMENT_LIKES 테이블에 복합 유니크 제약을 설정하여 사용자당 좋아요/싫어요 1회 제한 정책을 강제했습니다.
