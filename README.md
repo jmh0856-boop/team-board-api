@@ -79,3 +79,79 @@ erDiagram
    - Self-referencing: COMMENTS 테이블 내 parent_id를 통해 계층형 대댓글 구조를 구현했습니다.
    - Soft Delete: 댓글 삭제 시 물리적 삭제 대신 `deleted_by` 필드로 삭제 주체(작성자/관리자)를 기록하여 대화 맥락을 유지하도록 설계했습니다.
    - 중복 방지: LIKES 및 COMMENT_LIKES 테이블에 복합 유니크 제약을 설정하여 사용자당 좋아요/싫어요 1회 제한 정책을 강제했습니다.
+
+
+---
+
+## 📋 Table Definition (테이블 정의서)
+
+### USERS
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 사용자 고유 ID |
+| email | VARCHAR | UNIQUE, NOT NULL | 이메일 (로그인 ID) |
+| hashed_password | VARCHAR | NOT NULL | 암호화된 비밀번호 |
+| phone_number | VARCHAR | NULL | 전화번호 |
+| is_active | BOOLEAN | DEFAULT TRUE | 계정 활성화 여부 |
+| created_at | DATETIME | DEFAULT NOW | 가입일시 |
+
+---
+
+### BOARDS (구현 예정)
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 게시판 고유 ID |
+| name | VARCHAR | NOT NULL | 게시판 이름 |
+
+---
+
+### POSTS
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 게시글 고유 ID |
+| title | VARCHAR(200) | NOT NULL | 게시글 제목 |
+| content | TEXT | NOT NULL | 게시글 내용 |
+| user_id | INTEGER | FK(USERS.id), NOT NULL | 작성자 ID |
+| view_count | INTEGER | DEFAULT 0 | 조회수 |
+| created_at | DATETIME | DEFAULT NOW | 작성일시 |
+| updated_at | DATETIME | NULL | 수정일시 |
+
+---
+
+### COMMENTS
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 댓글 고유 ID |
+| content | TEXT | NOT NULL | 댓글 내용 |
+| user_id | INTEGER | FK(USERS.id), NOT NULL | 작성자 ID |
+| post_id | INTEGER | FK(POSTS.id), NOT NULL | 게시글 ID |
+| parent_id | INTEGER | FK(COMMENTS.id), NULL | 부모 댓글 ID (대댓글인 경우) |
+| is_deleted | BOOLEAN | DEFAULT FALSE | 삭제 여부 |
+| deleted_by | VARCHAR | NULL | 삭제 주체 (user/admin) |
+| created_at | DATETIME | DEFAULT NOW | 작성일시 |
+
+---
+
+### LIKES
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 좋아요 고유 ID |
+| user_id | INTEGER | FK(USERS.id), NOT NULL | 사용자 ID |
+| post_id | INTEGER | FK(POSTS.id), NOT NULL | 게시글 ID |
+| is_like | BOOLEAN | NOT NULL | 좋아요(TRUE) / 싫어요(FALSE) |
+| created_at | DATETIME | DEFAULT NOW | 생성일시 |
+
+> UNIQUE(user_id, post_id) — 한 사용자가 한 게시글에 한 번만 가능
+
+---
+
+### COMMENT_LIKES
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 좋아요 고유 ID |
+| user_id | INTEGER | FK(USERS.id), NOT NULL | 사용자 ID |
+| comment_id | INTEGER | FK(COMMENTS.id), NOT NULL | 댓글 ID |
+| is_like | BOOLEAN | NOT NULL | 좋아요(TRUE) / 싫어요(FALSE) |
+| created_at | DATETIME | DEFAULT NOW | 생성일시 |
+
+> UNIQUE(user_id, comment_id) — 한 사용자가 한 댓글에 한 번만 가능
