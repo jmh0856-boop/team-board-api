@@ -8,6 +8,7 @@ class PostCreate(BaseModel):
 
     title: str
     content: str
+    board_id: int | None = None
 
 
 class PostUpdate(BaseModel):
@@ -15,6 +16,7 @@ class PostUpdate(BaseModel):
 
     title: str | None = None
     content: str | None = None
+    board_id: int | None = None
 
 
 class PostAuthor(BaseModel):
@@ -27,12 +29,23 @@ class PostAuthor(BaseModel):
         from_attributes = True
 
 
+class PostBoard(BaseModel):
+    """게시글 게시판 정보"""
+
+    id: int
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
 class PostListResponse(BaseModel):
     """게시글 목록 응답 스키마"""
 
     id: int
     title: str
     author: PostAuthor
+    board: PostBoard | None = None
     created_at: datetime
 
     class Config:
@@ -46,6 +59,7 @@ class PostDetailResponse(BaseModel):
     title: str
     content: str
     author: PostAuthor
+    board: PostBoard | None = None
     created_at: datetime
     updated_at: datetime | None = None
     like_count: int = 0

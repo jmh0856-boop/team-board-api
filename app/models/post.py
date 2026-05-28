@@ -12,12 +12,14 @@ class Post(Base):
     title = Column(String(200), nullable=False)
     content = Column(Text, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    board_id = Column(Integer, ForeignKey("boards.id"), nullable=True)
     view_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # 관계 설정
     author = relationship("User", back_populates="posts")
+    board = relationship("Board", back_populates="posts")
     comments = relationship(
         "Comment", back_populates="post", cascade="all, delete-orphan"
     )
