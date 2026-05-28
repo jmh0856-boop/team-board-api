@@ -49,6 +49,7 @@ def get_detail(post_id: int, db: Session = Depends(get_db)):
         title=post.title,
         content=post.content,
         author=post.author,
+        board=post.board,
         created_at=post.created_at,
         updated_at=post.updated_at,
         view_count=post.view_count,

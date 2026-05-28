@@ -23,7 +23,7 @@ def authenticate_user(db: Session, email: str, password: str) -> User | None:
     return user
 
 
-def login_user(db: Session, email: str, password: str) -> str | None:
+def login_user(db: Session, email: str, password: str) -> dict | None:
     """로그인 처리 후 JWT Access Token 반환
 
     - 인증 실패 시 None 반환 → 라우터에서 401 처리
