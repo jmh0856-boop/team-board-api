@@ -78,8 +78,9 @@ def delete(
     current_user: User = Depends(get_current_user),  # 로그인 필요
 ):
     """댓글 삭제 - 작성자 또는 관리자만 가능"""
-    # is_active가 아닌 별도 is_admin 필드가 없으므로 현재는 작성자만 삭제 가능
-    delete_comment(db, comment_id, current_user.id, is_admin=False)
+    delete_comment(
+        db, comment_id, current_user.id, is_admin=current_user.is_admin
+    )
     return {"success": True, "message": "댓글이 삭제되었습니다."}
 
 
