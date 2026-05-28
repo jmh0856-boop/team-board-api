@@ -16,6 +16,7 @@ def create_post(db: Session, post_data: PostCreate, user_id: int) -> Post:
         title=post_data.title,
         content=post_data.content,
         user_id=user_id,
+        board_id=post_data.board_id,
     )
     db.add(post)
     db.commit()
