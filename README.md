@@ -169,11 +169,12 @@ erDiagram
 
 ---
 
-### BOARDS (구현 예정)
+### BOARDS
 | 컬럼명 | 타입 | 제약조건 | 설명 |
 |--------|------|----------|------|
 | id | INTEGER | PK, AUTO_INCREMENT | 게시판 고유 ID |
 | name | VARCHAR | NOT NULL | 게시판 이름 |
+| created_at | DATETIME | DEFAULT NOW | 생성일시 |
 
 ---
 
@@ -184,7 +185,7 @@ erDiagram
 | title | VARCHAR(200) | NOT NULL | 게시글 제목 |
 | content | TEXT | NOT NULL | 게시글 내용 |
 | user_id | INTEGER | FK(USERS.id), NOT NULL | 작성자 ID |
-| board_id | INTEGER | FK(BOARDS.id), NULL | 게시판 ID (구현 예정) |
+| board_id | INTEGER | FK(BOARDS.id), NULL | 게시판 ID |
 | view_count | INTEGER | DEFAULT 0 | 조회수 |
 | created_at | DATETIME | DEFAULT NOW | 작성일시 |
 | updated_at | DATETIME | NULL | 수정일시 |
