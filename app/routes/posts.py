@@ -20,10 +20,10 @@ from app.services.post_service import (
     update_post,
 )
 
-router = APIRouter(prefix="/posts", tags=["posts"])
+router = APIRouter(prefix="/posts", tags=["게시글"])
 
 
-@router.post("/", response_model=BaseResponse)
+@router.post("/", response_model=BaseResponse, summary="게시글 생성")
 def create(
     post_data: PostCreate,
     db: Session = Depends(get_db),
@@ -37,7 +37,7 @@ def create(
     )
 
 
-@router.get("/", response_model=BaseResponse)
+@router.get("/", response_model=BaseResponse, summary="게시글 목록 조회")
 def get_list(db: Session = Depends(get_db)):
     """게시글 목록 조회 - 누구나 가능"""
     posts = get_posts(db)
@@ -47,7 +47,7 @@ def get_list(db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{post_id}", response_model=BaseResponse)
+@router.get("/{post_id}", response_model=BaseResponse, summary="게시글 상세 조회")
 def get_detail(post_id: int, db: Session = Depends(get_db)):
     """게시글 상세 조회 - 누구나 가능 (조회수 증가)"""
     post = get_post(db, post_id)
@@ -70,7 +70,7 @@ def get_detail(post_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.patch("/{post_id}", response_model=BaseResponse)
+@router.patch("/{post_id}", response_model=BaseResponse, summary="게시글 수정")
 def update(
     post_id: int,
     post_data: PostUpdate,
@@ -85,7 +85,7 @@ def update(
     )
 
 
-@router.delete("/{post_id}", response_model=BaseResponse)
+@router.delete("/{post_id}", response_model=BaseResponse, summary="게시글 삭제")
 def delete(
     post_id: int,
     db: Session = Depends(get_db),
@@ -96,7 +96,7 @@ def delete(
     return BaseResponse(message="게시글 삭제 성공")
 
 
-@router.post("/{post_id}/like", response_model=BaseResponse)
+@router.post("/{post_id}/like", response_model=BaseResponse, summary="게시글 좋아요")
 def like(
     post_id: int,
     db: Session = Depends(get_db),
@@ -107,7 +107,9 @@ def like(
     return BaseResponse(message=result["message"])
 
 
-@router.post("/{post_id}/dislike", response_model=BaseResponse)
+@router.post(
+    "/{post_id}/dislike", response_model=BaseResponse, summary="게시글 싫어요"
+)
 def dislike(
     post_id: int,
     db: Session = Depends(get_db),

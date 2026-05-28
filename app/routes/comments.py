@@ -15,10 +15,10 @@ from app.services.comment_service import (
     update_comment,
 )
 
-router = APIRouter(prefix="/posts/{post_id}/comments", tags=["comments"])
+router = APIRouter(prefix="/posts/{post_id}/comments", tags=["댓글"])
 
 
-@router.post("/", response_model=BaseResponse)
+@router.post("/", response_model=BaseResponse, summary="댓글 생성")
 def create(
     post_id: int,
     comment_data: CommentCreate,
@@ -33,7 +33,9 @@ def create(
     )
 
 
-@router.post("/{comment_id}/replies", response_model=BaseResponse)
+@router.post(
+    "/{comment_id}/replies", response_model=BaseResponse, summary="대댓글 생성"
+)
 def create_reply(
     post_id: int,
     comment_id: int,
@@ -51,7 +53,7 @@ def create_reply(
     )
 
 
-@router.get("/", response_model=BaseResponse)
+@router.get("/", response_model=BaseResponse, summary="댓글 목록 조회")
 def get_list(post_id: int, db: Session = Depends(get_db)):
     """댓글 목록 조회 - 누구나 가능"""
     comments = get_comments(db, post_id)
@@ -61,7 +63,9 @@ def get_list(post_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{comment_id}/replies", response_model=BaseResponse)
+@router.get(
+    "/{comment_id}/replies", response_model=BaseResponse, summary="대댓글 목록 조회"
+)
 def get_reply_list(
     post_id: int, comment_id: int, db: Session = Depends(get_db)
 ):
@@ -73,7 +77,7 @@ def get_reply_list(
     )
 
 
-@router.patch("/{comment_id}", response_model=BaseResponse)
+@router.patch("/{comment_id}", response_model=BaseResponse, summary="댓글 수정")
 def update(
     post_id: int,
     comment_id: int,
@@ -91,7 +95,7 @@ def update(
     )
 
 
-@router.delete("/{comment_id}", response_model=BaseResponse)
+@router.delete("/{comment_id}", response_model=BaseResponse, summary="댓글 삭제")
 def delete(
     post_id: int,
     comment_id: int,
@@ -105,7 +109,9 @@ def delete(
     return BaseResponse(message="댓글 삭제 성공")
 
 
-@router.post("/{comment_id}/like", response_model=BaseResponse)
+@router.post(
+    "/{comment_id}/like", response_model=BaseResponse, summary="댓글 좋아요"
+)
 def like(
     post_id: int,
     comment_id: int,
@@ -117,7 +123,9 @@ def like(
     return BaseResponse(message=result["message"])
 
 
-@router.post("/{comment_id}/dislike", response_model=BaseResponse)
+@router.post(
+    "/{comment_id}/dislike", response_model=BaseResponse, summary="댓글 싫어요"
+)
 def dislike(
     post_id: int,
     comment_id: int,
