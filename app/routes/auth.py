@@ -13,10 +13,10 @@ from app.schemas.response import BaseResponse
 from app.schemas.token import RefreshTokenRequest, Token
 from app.services.auth_service import login_user
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["인증"])
 
 
-@router.post("/login", response_model=BaseResponse)
+@router.post("/login", response_model=BaseResponse, summary="로그인")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -40,7 +40,9 @@ def login(
     )
 
 
-@router.post("/refresh", response_model=BaseResponse)
+@router.post(
+    "/refresh", response_model=BaseResponse, summary="Access Token 재발급"
+)
 def refresh_token(request: RefreshTokenRequest):
     """Access Token 재발급
 

@@ -16,10 +16,10 @@ from app.services.board_service import (
     update_board,
 )
 
-router = APIRouter(prefix="/boards", tags=["boards"])
+router = APIRouter(prefix="/boards", tags=["게시판"])
 
 
-@router.post("/", response_model=BaseResponse)
+@router.post("/", response_model=BaseResponse, summary="게시판 생성")
 def create(
     board_data: BoardCreate,
     db: Session = Depends(get_db),
@@ -33,7 +33,7 @@ def create(
     )
 
 
-@router.get("/", response_model=BaseResponse)
+@router.get("/", response_model=BaseResponse, summary="게시판 목록 조회")
 def get_list(db: Session = Depends(get_db)):
     """게시판 목록 조회 - 누구나 가능"""
     boards = get_boards(db)
@@ -43,7 +43,7 @@ def get_list(db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{board_id}", response_model=BaseResponse)
+@router.get("/{board_id}", response_model=BaseResponse, summary="게시판 상세 조회")
 def get_detail(board_id: int, db: Session = Depends(get_db)):
     """게시판 상세 조회 - 누구나 가능"""
     board = get_board(db, board_id)
@@ -53,7 +53,7 @@ def get_detail(board_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.patch("/{board_id}", response_model=BaseResponse)
+@router.patch("/{board_id}", response_model=BaseResponse, summary="게시판 수정")
 def update(
     board_id: int,
     board_data: BoardUpdate,
@@ -68,7 +68,7 @@ def update(
     )
 
 
-@router.delete("/{board_id}", response_model=BaseResponse)
+@router.delete("/{board_id}", response_model=BaseResponse, summary="게시판 삭제")
 def delete(
     board_id: int,
     db: Session = Depends(get_db),
@@ -79,7 +79,9 @@ def delete(
     return BaseResponse(message="게시판 삭제 성공")
 
 
-@router.get("/{board_id}/posts", response_model=BaseResponse)
+@router.get(
+    "/{board_id}/posts", response_model=BaseResponse, summary="게시판 게시글 목록 조회"
+)
 def get_posts(board_id: int, db: Session = Depends(get_db)):
     """특정 게시판의 게시글 목록 조회 - 누구나 가능"""
     posts = get_board_posts(db, board_id)
