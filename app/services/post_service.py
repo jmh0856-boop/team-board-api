@@ -57,12 +57,14 @@ def update_post(
     return post
 
 
-def delete_post(db: Session, post_id: int, user_id: int) -> None:
-    """게시글 삭제 (작성자만 가능)"""
+def delete_post(
+    db: Session, post_id: int, user_id: int, is_admin: bool = False
+) -> None:
+    """게시글 삭제 (작성자 or 관리자만 가능)"""
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise NotFoundException("존재하지 않는 게시글입니다.")
-    if post.user_id != user_id:
+    if not is_admin and post.user_id != user_id:
         raise PermissionDeniedException()
     db.delete(post)
     db.commit()

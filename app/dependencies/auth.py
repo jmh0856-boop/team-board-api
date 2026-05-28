@@ -2,7 +2,10 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import InvalidTokenException
+from app.core.exceptions import (
+    InvalidTokenException,
+    PermissionDeniedException,
+)
 from app.core.security import decode_access_token
 from app.database import get_db
 from app.models.user import User
@@ -34,3 +37,15 @@ def get_current_user(
         raise InvalidTokenException()
 
     return user
+
+
+def get_current_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """현재 로그인한 유저가 관리자인지 확인
+
+    - 관리자가 아니면 403 반환
+    """
+    if not current_user.is_admin:
+        raise PermissionDeniedException()
+    return current_user
