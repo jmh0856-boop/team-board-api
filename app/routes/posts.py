@@ -51,21 +51,8 @@ def get_list(db: Session = Depends(get_db)):
 def get_detail(post_id: int, db: Session = Depends(get_db)):
     """게시글 상세 조회 - 누구나 가능 (조회수 증가)"""
     post = get_post(db, post_id)
-    like_count = sum(1 for like in post.likes if like.is_like)
-    dislike_count = sum(1 for like in post.likes if not like.is_like)
     return BaseResponse(
-        data=PostDetailResponse(
-            id=post.id,
-            title=post.title,
-            content=post.content,
-            author=post.author,
-            board=post.board,
-            created_at=post.created_at,
-            updated_at=post.updated_at,
-            view_count=post.view_count,
-            like_count=like_count,
-            dislike_count=dislike_count,
-        ),
+        data=PostDetailResponse.model_validate(post),
         message="게시글 상세 조회 성공",
     )
 

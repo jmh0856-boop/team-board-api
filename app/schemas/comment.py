@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class CommentCreate(BaseModel):
@@ -35,6 +35,16 @@ class CommentResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode="after")
+    def apply_deleted_message(self) -> CommentResponse:
+        """삭제된 댓글 메시지 처리"""
+        if self.is_deleted:
+            if self.deleted_by == "admin":
+                self.content = "관리자에 의해 삭제된 댓글입니다."
+            else:
+                self.content = "사용자에 의해 삭제된 댓글입니다."
+        return self
 
 
 class CommentUpdate(BaseModel):

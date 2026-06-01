@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class PostCreate(BaseModel):
@@ -64,3 +64,14 @@ class PostDetailResponse(BaseModel):
     view_count: int = 0
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode="before")
+    @classmethod
+    def calculate_likes(cls, data: object) -> object:
+        """좋아요/싫어요 수 계산"""
+        if hasattr(data, "likes"):
+            data.like_count = sum(1 for like in data.likes if like.is_like)
+            data.dislike_count = sum(
+                1 for like in data.likes if not like.is_like
+            )
+        return data
