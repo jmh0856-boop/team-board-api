@@ -3,4 +3,6 @@
 __pycache__/
 .DS_Store
 *.pyc
+app.db
+team_board.db
 test.db

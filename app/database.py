@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.core.config import settings
 
-# 엔진 생성
+# .env의 DATABASE_URL 사용
 engine = create_engine(
     settings.DATABASE_URL, connect_args={"check_same_thread": False}
 )
