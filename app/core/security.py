@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import jwt
 from jwt.exceptions import InvalidTokenError
@@ -23,7 +23,7 @@ def get_password_hash(password: str) -> str:
 def create_access_token(data: dict) -> str:
     """JWT Access Token 생성 (단기 토큰)"""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(
+    expire = datetime.now(timezone.utc) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
     )
     to_encode.update({"exp": expire})
@@ -41,7 +41,7 @@ def create_refresh_token(data: dict) -> str:
     - 만료 시간은 7일로 고정
     """
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=7)
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
     to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(
         to_encode,
