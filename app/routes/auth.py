@@ -9,18 +9,19 @@ from app.core.security import (
     decode_access_token,
 )
 from app.database import get_db
+from app.schemas.response import BaseResponse
 from app.schemas.token import RefreshTokenRequest, Token
 from app.services.auth_service import login_user
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["인증"])
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=BaseResponse, summary="로그인")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    """로그인 후 Access Token, Refresh Token 반환
+    """로그인
 
     - OAuth2PasswordRequestForm 사용 → Swagger에서 바로 테스트 가능
     - form_data.username이 이메일 역할 (OAuth2 표준 필드명)
@@ -32,13 +33,18 @@ def login(
         password=form_data.password,
     )
     if not tokens:
-        raise UnauthorizedException(detail="이메일 또는 비밀번호가 올바르지 않습니다.")  # 수정
-    return Token(**tokens)
+        raise UnauthorizedException(detail="이메일 또는 비밀번호가 올바르지 않습니다.")
+    return BaseResponse(
+        data=Token(**tokens),
+        message="로그인 성공",
+    )
 
 
-@router.post("/refresh", response_model=Token)
+@router.post(
+    "/refresh", response_model=BaseResponse, summary="Access Token 재발급"
+)
 def refresh_token(request: RefreshTokenRequest):
-    """Refresh Token으로 새 Access Token 재발급
+    """Access Token 재발급
 
     - Refresh Token 유효성 검증
     - type 필드가 refresh인지 확인
@@ -53,7 +59,10 @@ def refresh_token(request: RefreshTokenRequest):
         raise InvalidTokenException()
 
     data = {"sub": user_id}
-    return Token(
-        access_token=create_access_token(data=data),
-        refresh_token=create_refresh_token(data=data),
+    return BaseResponse(
+        data=Token(
+            access_token=create_access_token(data=data),
+            refresh_token=create_refresh_token(data=data),
+        ),
+        message="토큰 재발급 성공",
     )

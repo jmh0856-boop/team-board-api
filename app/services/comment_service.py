@@ -74,7 +74,7 @@ def get_comments(db: Session, post_id: int) -> list[Comment]:
 
 
 def _apply_deleted_message(comment: Comment) -> None:
-    """ "삭제된 댓글 메시지 처리"""
+    """삭제된 댓글 메시지 처리"""
     if comment.is_deleted:
         if comment.deleted_by == "admin":
             comment.content = "관리자에 의해 삭제된 댓글입니다."

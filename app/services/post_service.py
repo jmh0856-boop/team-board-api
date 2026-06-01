@@ -16,6 +16,7 @@ def create_post(db: Session, post_data: PostCreate, user_id: int) -> Post:
         title=post_data.title,
         content=post_data.content,
         user_id=user_id,
+        board_id=post_data.board_id,
     )
     db.add(post)
     db.commit()
@@ -52,6 +53,8 @@ def update_post(
         post.title = post_data.title
     if post_data.content is not None:
         post.content = post_data.content
+    if post_data.board_id is not None:
+        post.board_id = post_data.board_id
     db.commit()
     db.refresh(post)
     return post

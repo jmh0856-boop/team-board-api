@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PostCreate(BaseModel):
@@ -8,6 +8,7 @@ class PostCreate(BaseModel):
 
     title: str
     content: str
+    board_id: int | None = None
 
 
 class PostUpdate(BaseModel):
@@ -15,6 +16,7 @@ class PostUpdate(BaseModel):
 
     title: str | None = None
     content: str | None = None
+    board_id: int | None = None
 
 
 class PostAuthor(BaseModel):
@@ -23,8 +25,16 @@ class PostAuthor(BaseModel):
     id: int
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PostBoard(BaseModel):
+    """게시글 게시판 정보"""
+
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostListResponse(BaseModel):
@@ -33,10 +43,10 @@ class PostListResponse(BaseModel):
     id: int
     title: str
     author: PostAuthor
+    board: PostBoard | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostDetailResponse(BaseModel):
@@ -46,11 +56,11 @@ class PostDetailResponse(BaseModel):
     title: str
     content: str
     author: PostAuthor
+    board: PostBoard | None = None
     created_at: datetime
     updated_at: datetime | None = None
     like_count: int = 0
     dislike_count: int = 0
     view_count: int = 0
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
