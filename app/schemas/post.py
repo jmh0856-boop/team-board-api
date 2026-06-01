@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PostCreate(BaseModel):
@@ -25,8 +25,7 @@ class PostAuthor(BaseModel):
     id: int
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostBoard(BaseModel):
@@ -35,8 +34,7 @@ class PostBoard(BaseModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostListResponse(BaseModel):
@@ -48,8 +46,7 @@ class PostListResponse(BaseModel):
     board: PostBoard | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostDetailResponse(BaseModel):
@@ -66,5 +63,4 @@ class PostDetailResponse(BaseModel):
     dislike_count: int = 0
     view_count: int = 0
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
