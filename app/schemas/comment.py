@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CommentCreate(BaseModel):
@@ -17,8 +17,7 @@ class CommentAuthor(BaseModel):
     id: int
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommentResponse(BaseModel):
@@ -35,8 +34,7 @@ class CommentResponse(BaseModel):
     replies: list[CommentResponse] = []
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CommentUpdate(BaseModel):
