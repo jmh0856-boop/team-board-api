@@ -24,11 +24,12 @@ class CommentResponse(BaseModel):
     """댓글 응답 스키마"""
 
     id: int
-    content: str  # 삭제된 경우 메세지로 대체
+    content: str
     author: CommentAuthor
     post_id: int
-    parent_id: int | None = None  # 대댓글인 경우 부모 댓글 id
+    parent_id: int | None = None
     is_deleted: bool
+    deleted_by: str | None = None
     like_count: int = 0
     dislike_count: int = 0
     replies: list[CommentResponse] = []
@@ -48,6 +49,22 @@ class CommentResponse(BaseModel):
 
 
 class CommentUpdate(BaseModel):
-    """댓글 수정 요청 스키마"""  # 추가
+    """댓글 수정 요청 스키마"""
 
     content: str
+
+
+class CommentBaseResponse(BaseModel):
+    """댓글 단건 응답 스키마"""
+
+    success: bool = True
+    data: CommentResponse | None = None
+    message: str = "요청 성공"
+
+
+class CommentListBaseResponse(BaseModel):
+    """댓글 목록 응답 스키마"""
+
+    success: bool = True
+    data: list[CommentResponse] = []
+    message: str = "요청 성공"

@@ -75,3 +75,19 @@ class PostDetailResponse(BaseModel):
                 1 for like in data.likes if not like.is_like
             )
         return data
+
+
+class PostBaseResponse(BaseModel):
+    """게시글 단건 응답 스키마"""
+
+    success: bool = True
+    data: PostDetailResponse | None = None
+    message: str = "요청 성공"
+
+
+class PostListBaseResponse(BaseModel):
+    """게시글 목록 응답 스키마"""
+
+    success: bool = True
+    data: list[PostListResponse] = []
+    message: str = "요청 성공"

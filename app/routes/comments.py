@@ -4,8 +4,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
-from app.schemas.comment import CommentCreate, CommentResponse, CommentUpdate
-from app.schemas.response import BaseResponse
+from app.schemas.comment import (
+    CommentBaseResponse,
+    CommentCreate,
+    CommentListBaseResponse,
+    CommentResponse,
+    CommentUpdate,
+)
 from app.services.comment_service import (
     create_comment,
     delete_comment,
@@ -18,7 +23,7 @@ from app.services.comment_service import (
 router = APIRouter(prefix="/posts/{post_id}/comments", tags=["댓글"])
 
 
-@router.post("/", response_model=BaseResponse, summary="댓글 생성")
+@router.post("/", response_model=CommentBaseResponse, summary="댓글 생성")
 def create(
     post_id: int,
     comment_data: CommentCreate,
@@ -27,14 +32,16 @@ def create(
 ):
     """댓글 생성 - 로그인한 사용자만 가능"""
     comment = create_comment(db, post_id, comment_data, current_user.id)
-    return BaseResponse(
+    return CommentBaseResponse(
         data=CommentResponse.model_validate(comment),
         message="댓글 생성 성공",
     )
 
 
 @router.post(
-    "/{comment_id}/replies", response_model=BaseResponse, summary="대댓글 생성"
+    "/{comment_id}/replies",
+    response_model=CommentBaseResponse,
+    summary="대댓글 생성",
 )
 def create_reply(
     post_id: int,
@@ -47,37 +54,41 @@ def create_reply(
     comment = create_comment(
         db, post_id, comment_data, current_user.id, parent_id=comment_id
     )
-    return BaseResponse(
+    return CommentBaseResponse(
         data=CommentResponse.model_validate(comment),
         message="대댓글 생성 성공",
     )
 
 
-@router.get("/", response_model=BaseResponse, summary="댓글 목록 조회")
+@router.get("/", response_model=CommentListBaseResponse, summary="댓글 목록 조회")
 def get_list(post_id: int, db: Session = Depends(get_db)):
     """댓글 목록 조회 - 누구나 가능"""
     comments = get_comments(db, post_id)
-    return BaseResponse(
+    return CommentListBaseResponse(
         data=[CommentResponse.model_validate(comment) for comment in comments],
         message="댓글 목록 조회 성공",
     )
 
 
 @router.get(
-    "/{comment_id}/replies", response_model=BaseResponse, summary="대댓글 목록 조회"
+    "/{comment_id}/replies",
+    response_model=CommentListBaseResponse,
+    summary="대댓글 목록 조회",
 )
 def get_reply_list(
     post_id: int, comment_id: int, db: Session = Depends(get_db)
 ):
     """대댓글 목록 조회 - 누구나 가능"""
     replies = get_replies(db, comment_id)
-    return BaseResponse(
+    return CommentListBaseResponse(
         data=[CommentResponse.model_validate(reply) for reply in replies],
         message="대댓글 목록 조회 성공",
     )
 
 
-@router.patch("/{comment_id}", response_model=BaseResponse, summary="댓글 수정")
+@router.patch(
+    "/{comment_id}", response_model=CommentBaseResponse, summary="댓글 수정"
+)
 def update(
     post_id: int,
     comment_id: int,
@@ -89,13 +100,15 @@ def update(
     comment = update_comment(
         db, comment_id, comment_data.content, current_user.id
     )
-    return BaseResponse(
+    return CommentBaseResponse(
         data=CommentResponse.model_validate(comment),
         message="댓글 수정 성공",
     )
 
 
-@router.delete("/{comment_id}", response_model=BaseResponse, summary="댓글 삭제")
+@router.delete(
+    "/{comment_id}", response_model=CommentBaseResponse, summary="댓글 삭제"
+)
 def delete(
     post_id: int,
     comment_id: int,
@@ -106,11 +119,11 @@ def delete(
     delete_comment(
         db, comment_id, current_user.id, is_admin=current_user.is_admin
     )
-    return BaseResponse(message="댓글 삭제 성공")
+    return CommentBaseResponse(message="댓글 삭제 성공")
 
 
 @router.post(
-    "/{comment_id}/like", response_model=BaseResponse, summary="댓글 좋아요"
+    "/{comment_id}/like", response_model=CommentBaseResponse, summary="댓글 좋아요"
 )
 def like(
     post_id: int,
@@ -120,11 +133,13 @@ def like(
 ):
     """댓글 좋아요 - 로그인한 사용자만 가능"""
     result = toggle_comment_like(db, comment_id, current_user.id, is_like=True)
-    return BaseResponse(message=result["message"])
+    return CommentBaseResponse(message=result["message"])
 
 
 @router.post(
-    "/{comment_id}/dislike", response_model=BaseResponse, summary="댓글 싫어요"
+    "/{comment_id}/dislike",
+    response_model=CommentBaseResponse,
+    summary="댓글 싫어요",
 )
 def dislike(
     post_id: int,
@@ -136,4 +151,4 @@ def dislike(
     result = toggle_comment_like(
         db, comment_id, current_user.id, is_like=False
     )
-    return BaseResponse(message=result["message"])
+    return CommentBaseResponse(message=result["message"])
