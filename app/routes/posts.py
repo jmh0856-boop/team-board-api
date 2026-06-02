@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.responses import (
+    AUTH_RESPONSES,
+    COMMON_RESPONSES,
+    NOT_FOUND_RESPONSE,
+)
 from app.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
@@ -24,7 +29,12 @@ from app.services.post_service import (
 router = APIRouter(prefix="/posts", tags=["게시글"])
 
 
-@router.post("/", response_model=PostBaseResponse, summary="게시글 생성")
+@router.post(
+    "/",
+    response_model=PostBaseResponse,
+    summary="게시글 생성",
+    responses=AUTH_RESPONSES,
+)
 def create(
     post_data: PostCreate,
     db: Session = Depends(get_db),
@@ -48,7 +58,12 @@ def get_list(db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{post_id}", response_model=PostBaseResponse, summary="게시글 상세 조회")
+@router.get(
+    "/{post_id}",
+    response_model=PostBaseResponse,
+    summary="게시글 상세 조회",
+    responses=NOT_FOUND_RESPONSE,
+)
 def get_detail(post_id: int, db: Session = Depends(get_db)):
     """게시글 상세 조회 - 누구나 가능 (조회수 증가)"""
     post = get_post(db, post_id)
@@ -58,7 +73,12 @@ def get_detail(post_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.patch("/{post_id}", response_model=PostBaseResponse, summary="게시글 수정")
+@router.patch(
+    "/{post_id}",
+    response_model=PostBaseResponse,
+    summary="게시글 수정",
+    responses=COMMON_RESPONSES,
+)
 def update(
     post_id: int,
     post_data: PostUpdate,
@@ -73,7 +93,12 @@ def update(
     )
 
 
-@router.delete("/{post_id}", response_model=PostBaseResponse, summary="게시글 삭제")
+@router.delete(
+    "/{post_id}",
+    response_model=PostBaseResponse,
+    summary="게시글 삭제",
+    responses=COMMON_RESPONSES,
+)
 def delete(
     post_id: int,
     db: Session = Depends(get_db),
@@ -85,7 +110,10 @@ def delete(
 
 
 @router.post(
-    "/{post_id}/like", response_model=PostBaseResponse, summary="게시글 좋아요"
+    "/{post_id}/like",
+    response_model=PostBaseResponse,
+    summary="게시글 좋아요",
+    responses=COMMON_RESPONSES,
 )
 def like(
     post_id: int,
@@ -98,7 +126,10 @@ def like(
 
 
 @router.post(
-    "/{post_id}/dislike", response_model=PostBaseResponse, summary="게시글 싫어요"
+    "/{post_id}/dislike",
+    response_model=PostBaseResponse,
+    summary="게시글 싫어요",
+    responses=COMMON_RESPONSES,
 )
 def dislike(
     post_id: int,

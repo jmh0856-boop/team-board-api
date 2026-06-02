@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import InvalidTokenException, UnauthorizedException
+from app.core.responses import AUTH_RESPONSES
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -15,7 +16,12 @@ from app.services.auth_service import login_user
 router = APIRouter(prefix="/auth", tags=["인증"])
 
 
-@router.post("/login", response_model=TokenBaseResponse, summary="로그인")
+@router.post(
+    "/login",
+    response_model=TokenBaseResponse,
+    summary="로그인",
+    responses=AUTH_RESPONSES,
+)
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -40,7 +46,10 @@ def login(
 
 
 @router.post(
-    "/refresh", response_model=TokenBaseResponse, summary="Access Token 재발급"
+    "/refresh",
+    response_model=TokenBaseResponse,
+    summary="Access Token 재발급",
+    responses=AUTH_RESPONSES,
 )
 def refresh_token(request: RefreshTokenRequest):
     """Access Token 재발급

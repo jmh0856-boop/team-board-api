@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.responses import (
+    AUTH_RESPONSES,
+    COMMON_RESPONSES,
+    NOT_FOUND_RESPONSE,
+)
 from app.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
@@ -23,7 +28,12 @@ from app.services.comment_service import (
 router = APIRouter(prefix="/posts/{post_id}/comments", tags=["댓글"])
 
 
-@router.post("/", response_model=CommentBaseResponse, summary="댓글 생성")
+@router.post(
+    "/",
+    response_model=CommentBaseResponse,
+    summary="댓글 생성",
+    responses=AUTH_RESPONSES,
+)
 def create(
     post_id: int,
     comment_data: CommentCreate,
@@ -42,6 +52,7 @@ def create(
     "/{comment_id}/replies",
     response_model=CommentBaseResponse,
     summary="대댓글 생성",
+    responses=AUTH_RESPONSES,
 )
 def create_reply(
     post_id: int,
@@ -60,7 +71,12 @@ def create_reply(
     )
 
 
-@router.get("/", response_model=CommentListBaseResponse, summary="댓글 목록 조회")
+@router.get(
+    "/",
+    response_model=CommentListBaseResponse,
+    summary="댓글 목록 조회",
+    responses=NOT_FOUND_RESPONSE,
+)
 def get_list(post_id: int, db: Session = Depends(get_db)):
     """댓글 목록 조회 - 누구나 가능"""
     comments = get_comments(db, post_id)
@@ -74,6 +90,7 @@ def get_list(post_id: int, db: Session = Depends(get_db)):
     "/{comment_id}/replies",
     response_model=CommentListBaseResponse,
     summary="대댓글 목록 조회",
+    responses=NOT_FOUND_RESPONSE,
 )
 def get_reply_list(
     post_id: int, comment_id: int, db: Session = Depends(get_db)
@@ -87,7 +104,10 @@ def get_reply_list(
 
 
 @router.patch(
-    "/{comment_id}", response_model=CommentBaseResponse, summary="댓글 수정"
+    "/{comment_id}",
+    response_model=CommentBaseResponse,
+    summary="댓글 수정",
+    responses=COMMON_RESPONSES,
 )
 def update(
     post_id: int,
@@ -107,7 +127,10 @@ def update(
 
 
 @router.delete(
-    "/{comment_id}", response_model=CommentBaseResponse, summary="댓글 삭제"
+    "/{comment_id}",
+    response_model=CommentBaseResponse,
+    summary="댓글 삭제",
+    responses=COMMON_RESPONSES,
 )
 def delete(
     post_id: int,
@@ -123,7 +146,10 @@ def delete(
 
 
 @router.post(
-    "/{comment_id}/like", response_model=CommentBaseResponse, summary="댓글 좋아요"
+    "/{comment_id}/like",
+    response_model=CommentBaseResponse,
+    summary="댓글 좋아요",
+    responses=COMMON_RESPONSES,
 )
 def like(
     post_id: int,
@@ -140,6 +166,7 @@ def like(
     "/{comment_id}/dislike",
     response_model=CommentBaseResponse,
     summary="댓글 싫어요",
+    responses=COMMON_RESPONSES,
 )
 def dislike(
     post_id: int,

@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from app.database import Base, engine
 from app.models import board  # noqa: F401
@@ -16,7 +17,19 @@ from app.routes.users import router as user_router
 # 앱 시작 시 DB 테이블 자동 생성
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    swagger_ui_parameters={"persistAuthorization": True},
+)
+
+
+# 공통 에러 응답 형식 통일
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"success": False, "message": exc.detail},
+    )
+
 
 # 라우터 등록
 app.include_router(auth_router)
