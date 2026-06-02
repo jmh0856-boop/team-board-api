@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
 
 class PostCreate(BaseModel):
@@ -22,10 +22,12 @@ class PostUpdate(BaseModel):
 class PostAuthor(BaseModel):
     """게시글 작성자 정보"""
 
-    id: int
+    user_id: int = Field(validation_alias=AliasPath("id"))  # 수정
     email: str
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True, populate_by_name=True
+    )  # 수정
 
 
 class PostBoard(BaseModel):
