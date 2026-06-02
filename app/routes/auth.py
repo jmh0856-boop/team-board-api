@@ -9,14 +9,13 @@ from app.core.security import (
     decode_access_token,
 )
 from app.database import get_db
-from app.schemas.response import BaseResponse
-from app.schemas.token import RefreshTokenRequest, Token
+from app.schemas.token import RefreshTokenRequest, Token, TokenBaseResponse
 from app.services.auth_service import login_user
 
 router = APIRouter(prefix="/auth", tags=["인증"])
 
 
-@router.post("/login", response_model=BaseResponse, summary="로그인")
+@router.post("/login", response_model=TokenBaseResponse, summary="로그인")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -34,14 +33,14 @@ def login(
     )
     if not tokens:
         raise UnauthorizedException(detail="이메일 또는 비밀번호가 올바르지 않습니다.")
-    return BaseResponse(
+    return TokenBaseResponse(
         data=Token(**tokens),
         message="로그인 성공",
     )
 
 
 @router.post(
-    "/refresh", response_model=BaseResponse, summary="Access Token 재발급"
+    "/refresh", response_model=TokenBaseResponse, summary="Access Token 재발급"
 )
 def refresh_token(request: RefreshTokenRequest):
     """Access Token 재발급
@@ -59,7 +58,7 @@ def refresh_token(request: RefreshTokenRequest):
         raise InvalidTokenException()
 
     data = {"sub": user_id}
-    return BaseResponse(
+    return TokenBaseResponse(
         data=Token(
             access_token=create_access_token(data=data),
             refresh_token=create_refresh_token(data=data),
