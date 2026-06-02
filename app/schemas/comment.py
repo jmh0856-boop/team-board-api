@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
 
 class CommentCreate(BaseModel):
@@ -14,10 +14,10 @@ class CommentCreate(BaseModel):
 class CommentAuthor(BaseModel):
     """댓글 작성자 정보"""
 
-    id: int
+    user_id: int = Field(validation_alias=AliasPath("id"))
     email: str
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class CommentResponse(BaseModel):
@@ -46,6 +46,19 @@ class CommentResponse(BaseModel):
             else:
                 self.content = "사용자에 의해 삭제된 댓글입니다."
         return self
+
+    @model_validator(mode="before")  # 추가
+    @classmethod
+    def calculate_likes(cls, data: object) -> object:
+        """좋아요/싫어요 수 계산"""  # 추가
+        if hasattr(data, "comment_likes"):
+            data.like_count = sum(
+                1 for like in data.comment_likes if like.is_like
+            )
+            data.dislike_count = sum(
+                1 for like in data.comment_likes if not like.is_like
+            )
+        return data
 
 
 class CommentUpdate(BaseModel):

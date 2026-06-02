@@ -52,7 +52,7 @@ class UnauthorizedException(HTTPException):
         )
 
 
-class InvalidTokenException(HTTPException):  # 추가
+class InvalidTokenException(HTTPException):
     """유효하지 않은 토큰"""
 
     def __init__(self):

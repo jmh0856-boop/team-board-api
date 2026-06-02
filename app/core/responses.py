@@ -24,3 +24,8 @@ NOT_FOUND_RESPONSE = {
 AUTH_RESPONSES = {
     401: {"model": ErrorResponse, "description": "인증 실패"},
 }
+
+# 이메일 중복 에러 응답
+DUPLICATE_EMAIL_RESPONSE = {
+    400: {"model": ErrorResponse, "description": "이메일 중복"},
+}

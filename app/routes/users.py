@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import DuplicateEmailException
-from app.core.responses import AUTH_RESPONSES
+from app.core.responses import DUPLICATE_EMAIL_RESPONSE
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import UserBaseResponse, UserCreate, UserResponse
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["사용자"])
     "/",
     response_model=UserBaseResponse,
     summary="회원가입",
-    responses=AUTH_RESPONSES,
+    responses=DUPLICATE_EMAIL_RESPONSE,
 )
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """회원가입"""
