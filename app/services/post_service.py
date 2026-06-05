@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import (
@@ -121,3 +122,21 @@ def toggle_like(
     db.commit()
     action = "좋아요" if is_like else "싫어요"
     return {"message": f"{action}를 눌렀습니다."}
+
+
+def get_popular_posts_by_views(db: Session, limit: int = 10) -> list[Post]:
+    """조회수 기준 상위 N개 게시글 조회"""
+    return db.query(Post).order_by(Post.view_count.desc()).limit(limit).all()
+
+
+def get_popular_posts_by_likes(db: Session, limit: int = 10) -> list[Post]:
+    """좋아요 수 기준 상위 N개 게시글 조회"""
+    return (
+        db.query(Post)
+        .join(Like, Post.id == Like.post_id)
+        .filter(Like.is_like == True)  # noqa: E712
+        .group_by(Post.id)
+        .order_by(func.count(Like.id).desc())
+        .limit(limit)
+        .all()
+    )

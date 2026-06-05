@@ -20,6 +20,8 @@ from app.schemas.post import (
 from app.services.post_service import (
     create_post,
     delete_post,
+    get_popular_posts_by_likes,
+    get_popular_posts_by_views,
     get_post,
     get_posts,
     toggle_like,
@@ -55,6 +57,33 @@ def get_list(db: Session = Depends(get_db)):
     return PostListBaseResponse(
         data=[PostListResponse.model_validate(post) for post in posts],
         message="게시글 목록 조회 성공",
+    )
+
+
+@router.get(
+    "/popular",
+    response_model=PostListBaseResponse,
+    summary="인기글 조회",
+    responses=NOT_FOUND_RESPONSE,
+)
+def get_popular(
+    type: str = "views",
+    limit: int = 10,
+    db: Session = Depends(get_db),
+):
+    """인기글 조회 - 누구나 가능
+
+    - type=views: 조회수 기준
+    - type=likes: 좋아요 수 기준
+    - limit: 조회할 게시글 수 (기본값 10)
+    """
+    if type == "likes":
+        posts = get_popular_posts_by_likes(db, limit)
+    else:
+        posts = get_popular_posts_by_views(db, limit)
+    return PostListBaseResponse(
+        data=[PostListResponse.model_validate(post) for post in posts],
+        message="인기글 조회 성공",
     )
 
 
