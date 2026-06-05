@@ -26,3 +26,6 @@ class Post(Base):
     likes = relationship(
         "Like", back_populates="post", cascade="all, delete-orphan"
     )
+    tags = relationship(
+        "PostTag", back_populates="post", cascade="all, delete-orphan"
+    )

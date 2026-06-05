@@ -7,6 +7,7 @@ from app.core.exceptions import (
 )
 from app.models.like import Like
 from app.models.post import Post
+from app.models.tag import PostTag, Tag
 from app.schemas.post import PostCreate, PostUpdate
 
 
@@ -19,6 +20,17 @@ def create_post(db: Session, post_data: PostCreate, user_id: int) -> Post:
         board_id=post_data.board_id,
     )
     db.add(post)
+    db.flush()
+
+    for name in post_data.tag_names:
+        tag = db.query(Tag).filter(Tag.name == name.strip()).first()
+        if not tag:
+            tag = Tag(name=name.strip())
+            db.add(tag)
+            db.flush()
+        post_tag = PostTag(post_id=post.id, tag_id=tag.id)
+        db.add(post_tag)
+
     db.commit()
     db.refresh(post)
     return post

@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
+from app.schemas.tag import TagResponse
+
 
 class PostCreate(BaseModel):
     """게시글 생성 요청 스키마"""
@@ -9,6 +11,7 @@ class PostCreate(BaseModel):
     title: str
     content: str
     board_id: int | None = None
+    tag_names: list[str] = []
 
 
 class PostUpdate(BaseModel):
@@ -46,9 +49,25 @@ class PostListResponse(BaseModel):
     title: str
     author: PostAuthor
     board: PostBoard | None = None
+    tags: list[TagResponse] = []
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode="before")
+    @classmethod
+    def extract_tags(cls, data: object) -> object:
+        """PostTag에서 Tag 정보 추출"""
+        if not hasattr(data, "__dict__"):
+            return data
+        result = {}
+        result["id"] = data.id
+        result["title"] = data.title
+        result["author"] = data.author
+        result["board"] = data.board
+        result["created_at"] = data.created_at
+        result["tags"] = [pt.tag for pt in data.tags]
+        return result
 
 
 class PostDetailResponse(BaseModel):
@@ -59,6 +78,7 @@ class PostDetailResponse(BaseModel):
     content: str
     author: PostAuthor
     board: PostBoard | None = None
+    tags: list[TagResponse] = []
     created_at: datetime
     updated_at: datetime | None = None
     like_count: int = 0
@@ -70,13 +90,24 @@ class PostDetailResponse(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def calculate_likes(cls, data: object) -> object:
-        """좋아요/싫어요 수 계산"""
-        if hasattr(data, "likes"):
-            data.like_count = sum(1 for like in data.likes if like.is_like)
-            data.dislike_count = sum(
-                1 for like in data.likes if not like.is_like
-            )
-        return data
+        """좋아요/싫어요 수 계산 및 태그 추출"""
+        if not hasattr(data, "__dict__"):
+            return data
+        result = {}
+        result["id"] = data.id
+        result["title"] = data.title
+        result["content"] = data.content
+        result["author"] = data.author
+        result["board"] = data.board
+        result["created_at"] = data.created_at
+        result["updated_at"] = data.updated_at
+        result["view_count"] = data.view_count
+        result["like_count"] = sum(1 for like in data.likes if like.is_like)
+        result["dislike_count"] = sum(
+            1 for like in data.likes if not like.is_like
+        )
+        result["tags"] = [pt.tag for pt in data.tags]
+        return result
 
 
 class PostBaseResponse(BaseModel):
