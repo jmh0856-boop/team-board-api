@@ -74,6 +74,24 @@
 
 ---
 
+### 태그
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-30 | 회원 | 게시글 작성 시 태그를 등록할 수 있다 | 중 |
+| REQ-31 | 회원 | 태그는 여러 개 등록할 수 있다 | 중 |
+| REQ-32 | 회원 | 본인이 작성한 게시글의 태그를 수정할 수 있다 | 중 |
+| REQ-33 | 비회원 | 특정 태그가 달린 게시글 목록을 조회할 수 있다 | 중 |
+
+---
+
+### 인기글
+| ID | 사용자 | 요구사항 | 우선순위 |
+|----|--------|----------|----------|
+| REQ-34 | 비회원 | 조회수 기준 상위 N개의 게시글을 조회할 수 있다 | 중 |
+| REQ-35 | 비회원 | 좋아요 수 기준 상위 N개의 게시글을 조회할 수 있다 | 중 |
+
+---
+
 ## 🗂 Database Design (ERD)
 
 ```mermaid
@@ -87,6 +105,8 @@ erDiagram
     BOARDS ||--o{ POSTS : contains
     COMMENTS ||--o{ COMMENTS : replies
     COMMENTS ||--o{ COMMENT_LIKES : "receives"
+    POSTS ||--o{ POST_TAGS : has
+    TAGS ||--o{ POST_TAGS : has
 
     USERS {
         int id PK
@@ -139,6 +159,17 @@ erDiagram
         string deleted_by
         datetime created_at
         datetime updated_at
+    }
+
+    TAGS {
+        int id PK
+        string name
+    }
+
+    POST_TAGS {
+        int id PK
+        int post_id FK
+        int tag_id FK
     }
 ```
 
@@ -230,3 +261,22 @@ erDiagram
 | created_at | DATETIME | DEFAULT NOW | 생성일시 |
 
 > UNIQUE(user_id, comment_id) — 한 사용자가 한 댓글에 한 번만 가능
+
+---
+
+### TAGS
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 태그 고유 ID |
+| name | VARCHAR | UNIQUE, NOT NULL | 태그 이름 |
+
+---
+
+### POST_TAGS
+| 컬럼명 | 타입 | 제약조건 | 설명 |
+|--------|------|----------|------|
+| id | INTEGER | PK, AUTO_INCREMENT | 고유 ID |
+| post_id | INTEGER | FK(POSTS.id), NOT NULL | 게시글 ID |
+| tag_id | INTEGER | FK(TAGS.id), NOT NULL | 태그 ID |
+
+> UNIQUE(post_id, tag_id) — 같은 게시글에 같은 태그 중복 불가
