@@ -1,3 +1,5 @@
+import math
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -9,7 +11,8 @@ from app.schemas.board import (
     BoardResponse,
 )
 from app.schemas.post import PostListBaseResponse, PostListResponse
-from app.services.board_service import get_board, get_board_posts, get_boards
+from app.services.board_service import get_board, get_boards
+from app.services.post_service import get_posts as get_post_list
 
 router = APIRouter(prefix="/boards", tags=["게시판"])
 
@@ -45,10 +48,19 @@ def get_detail(board_id: int, db: Session = Depends(get_db)):
     summary="게시판 게시글 목록 조회",
     responses=NOT_FOUND_RESPONSE,
 )
-def get_posts(board_id: int, db: Session = Depends(get_db)):
+def get_posts(
+    board_id: int,
+    page: int = 1,
+    size: int = 10,
+    db: Session = Depends(get_db),
+):
     """특정 게시판의 게시글 목록 조회 - 누구나 가능"""
-    posts = get_board_posts(db, board_id)
+    posts, total = get_post_list(db, board_id=board_id, page=page, size=size)
     return PostListBaseResponse(
         data=[PostListResponse.model_validate(post) for post in posts],
+        total=total,
+        page=page,
+        size=size,
+        total_pages=math.ceil(total / size) if size > 0 else 0,
         message="게시판 게시글 목록 조회 성공",
     )
