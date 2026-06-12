@@ -15,6 +15,13 @@ from app.schemas.post import PostCreate, PostUpdate
 
 def create_post(db: Session, post_data: PostCreate, user_id: int) -> Post:
     """게시글 생성"""
+    if post_data.board_id is not None:
+        from app.models.board import Board
+
+        board = db.query(Board).filter(Board.id == post_data.board_id).first()
+        if not board:
+            raise NotFoundException("존재하지 않는 게시판입니다.")
+
     post = Post(
         title=post_data.title,
         content=post_data.content,
@@ -95,7 +102,13 @@ def update_post(
     if post_data.content is not None:
         post.content = post_data.content
     if post_data.board_id is not None:
+        from app.models.board import Board
+
+        board = db.query(Board).filter(Board.id == post_data.board_id).first()
+        if not board:
+            raise NotFoundException("존재하지 않는 게시판입니다.")
         post.board_id = post_data.board_id
+
     db.commit()
     db.refresh(post)
     return post
