@@ -131,6 +131,7 @@ erDiagram
     BOARDS {
         int id PK
         string name
+        datetime created_at
     }
 
     POSTS {
