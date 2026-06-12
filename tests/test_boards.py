@@ -22,7 +22,7 @@ def admin_token(client):
 def test_create_board_forbidden(client, admin_token):
     """일반 유저 게시판 생성 실패 테스트"""
     response = client.post(
-        "/boards/",
+        "/admin/boards/",
         json={"name": "테스트 게시판"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
