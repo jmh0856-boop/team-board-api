@@ -1,3 +1,5 @@
+import math
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -51,11 +53,29 @@ def create(
 
 
 @router.get("/", response_model=PostListBaseResponse, summary="게시글 목록 조회")
-def get_list(db: Session = Depends(get_db)):
-    """게시글 목록 조회 - 누구나 가능"""
-    posts = get_posts(db)
+def get_list(
+    keyword: str | None = None,
+    board_id: int | None = None,
+    page: int = 1,
+    size: int = 10,
+    db: Session = Depends(get_db),
+):
+    """게시글 목록 조회 - 누구나 가능
+
+    - keyword: 검색어 (제목, 내용, 작성자 이메일)
+    - board_id: 게시판 필터
+    - page: 페이지 번호 (기본값 1)
+    - size: 페이지당 게시글 수 (기본값 10)
+    """
+    posts, total = get_posts(
+        db, keyword=keyword, board_id=board_id, page=page, size=size
+    )
     return PostListBaseResponse(
         data=[PostListResponse.model_validate(post) for post in posts],
+        total=total,
+        page=page,
+        size=size,
+        total_pages=math.ceil(total / size) if size > 0 else 0,
         message="게시글 목록 조회 성공",
     )
 

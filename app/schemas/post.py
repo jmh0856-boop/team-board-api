@@ -123,4 +123,8 @@ class PostListBaseResponse(BaseModel):
 
     success: bool = True
     data: list[PostListResponse] = []
+    total: int = 0
+    page: int = 1
+    size: int = 10
+    total_pages: int = 0
     message: str = "요청 성공"

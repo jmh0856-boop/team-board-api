@@ -9,6 +9,7 @@ from app.core.exceptions import (
 from app.models.like import Like
 from app.models.post import Post
 from app.models.tag import PostTag, Tag
+from app.models.user import User
 from app.schemas.post import PostCreate, PostUpdate
 
 
@@ -37,9 +38,36 @@ def create_post(db: Session, post_data: PostCreate, user_id: int) -> Post:
     return post
 
 
-def get_posts(db: Session) -> list[Post]:
-    """게시글 목록 조회"""
-    return db.query(Post).order_by(Post.created_at.desc()).all()
+def get_posts(
+    db: Session,
+    keyword: str | None = None,
+    board_id: int | None = None,
+    page: int = 1,
+    size: int = 10,
+) -> tuple[list[Post], int]:
+    """게시글 목록 조회 (검색 + 페이지네이션)"""
+    query = db.query(Post)
+
+    # 게시판 필터
+    if board_id:
+        query = query.filter(Post.board_id == board_id)
+
+    # 검색 (제목, 내용, 작성자 이메일)
+    if keyword:
+        query = query.join(User, Post.user_id == User.id).filter(
+            Post.title.contains(keyword)
+            | Post.content.contains(keyword)
+            | User.email.contains(keyword)
+        )
+
+    total = query.count()
+    posts = (
+        query.order_by(Post.created_at.desc())
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+    return posts, total
 
 
 def get_post(db: Session, post_id: int) -> Post:
