@@ -23,7 +23,7 @@ def post_id(client, auth_token):
         json={"title": "태그 테스트 게시글", "content": "내용", "tag_names": ["태그1"]},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    return response.json()["data"]["id"]
+    return response.json()["data"]["post_id"]
 
 
 def test_create_post_with_tags(client, auth_token):

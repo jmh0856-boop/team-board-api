@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 
 class BoardCreate(BaseModel):
@@ -18,11 +18,11 @@ class BoardUpdate(BaseModel):
 class BoardResponse(BaseModel):
     """게시판 응답 스키마"""
 
-    id: int
+    board_id: int = Field(validation_alias=AliasPath("id"))
     name: str
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class BoardBaseResponse(BaseModel):

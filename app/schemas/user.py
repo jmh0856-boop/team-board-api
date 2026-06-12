@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import AliasPath, BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -10,9 +10,9 @@ class UserCreate(UserBase):
 
 
 class UserResponse(UserBase):
-    id: int
+    user_id: int = Field(validation_alias=AliasPath("id"))
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class UserBaseResponse(BaseModel):
