@@ -87,7 +87,7 @@ def get_list(
     responses=NOT_FOUND_RESPONSE,
 )
 def get_popular(
-    type: str = "views",
+    sort_type: str = "views",
     limit: int = 10,
     db: Session = Depends(get_db),
 ):
@@ -97,7 +97,7 @@ def get_popular(
     - type=likes: 좋아요 수 기준
     - limit: 조회할 게시글 수 (기본값 10)
     """
-    if type == "likes":
+    if sort_type == "likes":
         posts = get_popular_posts_by_likes(db, limit)
     else:
         posts = get_popular_posts_by_views(db, limit)

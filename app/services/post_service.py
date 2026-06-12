@@ -56,7 +56,7 @@ def get_posts(
     query = db.query(Post)
 
     # 게시판 필터
-    if board_id:
+    if board_id is not None:
         query = query.filter(Post.board_id == board_id)
 
     # 검색 (제목, 내용, 작성자 이메일)

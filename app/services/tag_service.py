@@ -44,16 +44,23 @@ def set_post_tags(
     return tags
 
 
-def get_posts_by_tag(db: Session, tag_name: str) -> list[Post]:
+def get_posts_by_tag(
+    db: Session,
+    tag_name: str,
+    page: int = 1,
+    size: int = 10,
+) -> tuple[list[Post], int]:
     """특정 태그가 달린 게시글 목록 조회"""
     tag = db.query(Tag).filter(Tag.name == tag_name).first()
     if not tag:
         raise NotFoundException("존재하지 않는 태그입니다.")
 
-    return (
-        db.query(Post)
-        .join(PostTag)
-        .filter(PostTag.tag_id == tag.id)
-        .order_by(Post.created_at.desc())
+    query = db.query(Post).join(PostTag).filter(PostTag.tag_id == tag.id)
+    total = query.count()
+    posts = (
+        query.order_by(Post.created_at.desc())
+        .offset((page - 1) * size)
+        .limit(size)
         .all()
     )
+    return posts, total

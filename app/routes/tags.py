@@ -1,3 +1,5 @@
+import math
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -60,11 +62,17 @@ def update_tags(
 )
 def filter_by_tag(
     tag_name: str,
+    page: int = 1,
+    size: int = 10,
     db: Session = Depends(get_db),
 ):
     """특정 태그가 달린 게시글 목록 조회 - 누구나 가능"""
-    posts = get_posts_by_tag(db, tag_name)
+    posts, total = get_posts_by_tag(db, tag_name, page=page, size=size)
     return PostListBaseResponse(
         data=[PostListResponse.model_validate(post) for post in posts],
+        total=total,
+        page=page,
+        size=size,
+        total_pages=math.ceil(total / size) if size > 0 else 0,
         message="태그 필터링 성공",
     )
