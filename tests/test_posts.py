@@ -127,3 +127,35 @@ def test_delete_post_forbidden(client, auth_token):
         headers={"Authorization": f"Bearer {other_token}"},
     )
     assert response.status_code == 403
+
+
+def test_get_posts_pagination(client):
+    """게시글 목록 페이지네이션 테스트"""
+    response = client.get("/posts/?page=1&size=3")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert len(data["data"]) <= 3
+    assert "total" in data
+    assert "page" in data
+    assert "size" in data
+    assert "total_pages" in data
+
+
+def test_search_posts_by_keyword(client):
+    """게시글 키워드 검색 테스트"""
+    response = client.get("/posts/?keyword=테스트")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert isinstance(data["data"], list)
+
+
+def test_search_posts_no_result(client):
+    """존재하지 않는 키워드 검색 테스트"""
+    response = client.get("/posts/?keyword=없는게시글12345")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert len(data["data"]) == 0
+    assert data["total"] == 0
