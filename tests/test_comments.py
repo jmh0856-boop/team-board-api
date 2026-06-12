@@ -26,7 +26,7 @@ def post_id(client, auth_token):
         json={"title": "댓글 테스트 게시글", "content": "내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    return response.json()["data"]["id"]
+    return response.json()["data"]["post_id"]
 
 
 def test_create_comment(client, auth_token, post_id):
@@ -69,7 +69,7 @@ def test_update_comment(client, auth_token, post_id):
         json={"content": "수정 전 댓글"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    comment_id = create_response.json()["data"]["id"]
+    comment_id = create_response.json()["data"]["comment_id"]
 
     response = client.patch(
         f"/posts/{post_id}/comments/{comment_id}",
@@ -89,7 +89,7 @@ def test_delete_comment(client, auth_token, post_id):
         json={"content": "삭제 테스트 댓글"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    comment_id = create_response.json()["data"]["id"]
+    comment_id = create_response.json()["data"]["comment_id"]
 
     response = client.delete(
         f"/posts/{post_id}/comments/{comment_id}",
@@ -106,7 +106,7 @@ def test_create_reply(client, auth_token, post_id):
         json={"content": "부모 댓글"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    comment_id = create_response.json()["data"]["id"]
+    comment_id = create_response.json()["data"]["comment_id"]
 
     response = client.post(
         f"/posts/{post_id}/comments/{comment_id}/replies",
@@ -128,7 +128,7 @@ def test_comment_like(client, auth_token, post_id):
         json={"content": "좋아요 테스트 댓글"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    comment_id = create_response.json()["data"]["id"]
+    comment_id = create_response.json()["data"]["comment_id"]
 
     response = client.post(
         f"/posts/{post_id}/comments/{comment_id}/like",

@@ -56,13 +56,13 @@ def test_get_post_detail(client, auth_token):
         json={"title": "상세 조회 테스트", "content": "내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    post_id = create_response.json()["data"]["id"]
+    post_id = create_response.json()["data"]["post_id"]
 
     response = client.get(f"/posts/{post_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
-    assert data["data"]["id"] == post_id
+    assert data["data"]["post_id"] == post_id
     assert data["data"]["view_count"] == 1
 
 
@@ -73,7 +73,7 @@ def test_update_post(client, auth_token):
         json={"title": "수정 전 제목", "content": "수정 전 내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    post_id = create_response.json()["data"]["id"]
+    post_id = create_response.json()["data"]["post_id"]
 
     response = client.patch(
         f"/posts/{post_id}",
@@ -93,7 +93,7 @@ def test_delete_post(client, auth_token):
         json={"title": "삭제 테스트", "content": "내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    post_id = create_response.json()["data"]["id"]
+    post_id = create_response.json()["data"]["post_id"]
 
     response = client.delete(
         f"/posts/{post_id}",
@@ -110,7 +110,7 @@ def test_delete_post_forbidden(client, auth_token):
         json={"title": "권한 테스트", "content": "내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    post_id = create_response.json()["data"]["id"]
+    post_id = create_response.json()["data"]["post_id"]
 
     # 다른 유저 생성 및 토큰 발급
     client.post(

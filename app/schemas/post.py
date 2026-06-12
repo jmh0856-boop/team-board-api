@@ -25,34 +25,32 @@ class PostUpdate(BaseModel):
 class PostAuthor(BaseModel):
     """게시글 작성자 정보"""
 
-    user_id: int = Field(validation_alias=AliasPath("id"))  # 수정
+    user_id: int = Field(validation_alias=AliasPath("id"))
     email: str
 
-    model_config = ConfigDict(
-        from_attributes=True, populate_by_name=True
-    )  # 수정
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class PostBoard(BaseModel):
     """게시글 게시판 정보"""
 
-    id: int
+    board_id: int = Field(validation_alias=AliasPath("id"))
     name: str
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class PostListResponse(BaseModel):
     """게시글 목록 응답 스키마"""
 
-    id: int
+    post_id: int = Field(validation_alias=AliasPath("id"))
     title: str
     author: PostAuthor
     board: PostBoard | None = None
     tags: list[TagResponse] = []
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     @model_validator(mode="before")
     @classmethod
@@ -73,7 +71,7 @@ class PostListResponse(BaseModel):
 class PostDetailResponse(BaseModel):
     """게시글 상세 응답 스키마"""
 
-    id: int
+    post_id: int = Field(validation_alias=AliasPath("id"))
     title: str
     content: str
     author: PostAuthor
@@ -85,7 +83,7 @@ class PostDetailResponse(BaseModel):
     dislike_count: int = 0
     view_count: int = 0
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     @model_validator(mode="before")
     @classmethod

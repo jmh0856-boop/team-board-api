@@ -26,7 +26,7 @@ def post_id(client, auth_token):
         json={"title": "인기글 테스트", "content": "내용"},
         headers={"Authorization": f"Bearer {auth_token}"},
     )
-    return response.json()["data"]["id"]
+    return response.json()["data"]["post_id"]
 
 
 def test_popular_by_views(client):

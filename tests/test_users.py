@@ -11,7 +11,7 @@ def test_create_user(client):
     data = response.json()
     assert data["success"] is True
     assert data["data"]["email"] == "test@example.com"
-    assert "id" in data["data"]
+    assert "user_id" in data["data"]
     assert data["message"] == "회원가입 성공"
 
 

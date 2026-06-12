@@ -1,13 +1,13 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 
 class TagResponse(BaseModel):
     """태그 응답 스키마"""
 
-    id: int
+    tag_id: int = Field(validation_alias=AliasPath("id"))
     name: str
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class TagCreate(BaseModel):
